@@ -1,4 +1,8 @@
-dist: xenial
+dist: bionic
+addons:
+  apt:
+    packages:
+
 language: cpp
 compiler: clang
 script:
