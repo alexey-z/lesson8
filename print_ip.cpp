@@ -1,12 +1,51 @@
 #include <iostream>
 #include <vector>
+#include <list>
 
 template<typename T>
-struct type_is {
+struct is_vector {
 	using type = T;
+	constexpr static bool value = false;
+};
+template<typename T>
+struct is_vector<std::vector<T>> {
+	using type = std::vector<T>;
+	constexpr static bool value = true;
 };
 
 template<typename T>
+struct is_list {
+	using type = T;
+	constexpr static bool value = false;
+};
+template<typename T>
+struct is_list<std::list<T>> {
+	using type = std::list<T>;
+	constexpr static bool value = true;
+};
+
+template<typename T,
+	std::enable_if_t<std::is_same_v<std::string,T>, bool> = 0>
+void print_ip(T v)
+{ 
+	std::cout << v << std::endl;
+};
+
+template<typename T,
+	std::enable_if_t<(is_vector<T>::value || is_list<T>::value), bool> = 0>
+void print_ip(T v)
+{ 
+	for (auto i = v.begin(); i != v.end(); i++) {
+		std::cout << *i;
+		if (std::next(i) != v.end()) {
+			std::cout << ".";
+		}
+	}
+	std::cout << std::endl;
+};
+
+template<typename T,
+	std::enable_if_t<std::is_integral_v<T>, bool> = 0>
 void print_ip(T v)
 {
 	uint8_t* bytes = reinterpret_cast<uint8_t*>(&v);
@@ -17,21 +56,7 @@ void print_ip(T v)
 			std::cout << ".";
 	}
 	std::cout << std::endl;
-};
-
-//template<typename T>
-//typename std::enable_if_t<std::is_integral_v<T>>::type
-//print_ip(T v)
-//{
-//	std::cout << v << std::endl;
-//};
-
-template<>
-void print_ip(std::string v)
-{ 
-	std::cout << v << std::endl;
-};
-
+}
 
 int main()
 {
@@ -46,4 +71,10 @@ int main()
 		vec_ips.push_back(i);
 	}
 	print_ip(vec_ips);
+	std::list<int> list_ips;
+	for (int i=0; i<4; i++)
+	{
+		list_ips.push_back(i);
+	}
+	print_ip(list_ips);
 }
