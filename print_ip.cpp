@@ -3,23 +3,17 @@
 #include <list>
 
 template<typename T>
-struct is_vector {
+struct is_cont {
 	using type = T;
 	constexpr static bool value = false;
 };
 template<typename T>
-struct is_vector<std::vector<T>> {
+struct is_cont<std::vector<T>> {
 	using type = std::vector<T>;
 	constexpr static bool value = true;
 };
-
 template<typename T>
-struct is_list {
-	using type = T;
-	constexpr static bool value = false;
-};
-template<typename T>
-struct is_list<std::list<T>> {
+struct is_cont<std::list<T>> {
 	using type = std::list<T>;
 	constexpr static bool value = true;
 };
@@ -32,7 +26,7 @@ void print_ip(T v)
 };
 
 template<typename T,
-	std::enable_if_t<(is_vector<T>::value || is_list<T>::value), bool> = 0>
+	std::enable_if_t<is_cont<T>::value, bool> = 0>
 void print_ip(T v)
 { 
 	for (auto i = v.begin(); i != v.end(); i++) {
